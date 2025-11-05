@@ -1,7 +1,7 @@
 import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 
-type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion';
+type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion' | 'requiresTypeInformation';
 
 export const avoidAs = ESLintUtils.RuleCreator(
   (name) => `https://github.com/johannesvollmer/eslint-ts-avoid-as#${name}`
@@ -15,12 +15,35 @@ export const avoidAs = ESLintUtils.RuleCreator(
     messages: {
       avoidAsWithLiteral: 'Avoid using `as` for type assertions on literals. Use `satisfies` instead.',
       incompatibleTypeAssertion: 'Type assertion is invalid: the literal type cannot be assigned to the target type.',
+      requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
     },
     schema: [],
   },
   defaultOptions: [],
   create(context) {
-    const services = ESLintUtils.getParserServices(context);
+    const services = ESLintUtils.getParserServices(context, true);
+    
+    // Check if full type information is available
+    if (!services.program) {
+      // If no type information is available, we can only detect literal assertions
+      // but cannot check type assignability
+      return {
+        TSAsExpression(node: TSESTree.TSAsExpression) {
+          // Check if the expression being cast is a literal
+          if (
+            node.expression.type === 'ObjectExpression' ||
+            node.expression.type === 'ArrayExpression' ||
+            node.expression.type === 'Literal'
+          ) {
+            context.report({
+              node,
+              messageId: 'avoidAsWithLiteral',
+            });
+          }
+        },
+      };
+    }
+
     const checker = services.program.getTypeChecker();
 
     return {
