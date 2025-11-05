@@ -24,6 +24,19 @@ export const avoidAs = ESLintUtils.RuleCreator(
   create(context) {
     const services = ESLintUtils.getParserServices(context, true);
     
+    // Helper function to create a fixer that replaces 'as' with 'satisfies'
+    const createFix = (node: TSESTree.TSAsExpression) => {
+      return (fixer: any) => {
+        const sourceCode = context.sourceCode;
+        // Get the token after the expression - should be the 'as' keyword
+        const asToken = sourceCode.getTokenAfter(node.expression);
+        if (asToken && asToken.value === 'as') {
+          return fixer.replaceText(asToken, 'satisfies');
+        }
+        return null;
+      };
+    };
+    
     // Check if full type information is available
     if (!services.program) {
       // If no type information is available, we can only detect literal assertions
@@ -39,16 +52,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
-              fix(fixer) {
-                const sourceCode = context.sourceCode;
-                const asToken = sourceCode.getTokenAfter(node.expression, {
-                  filter: (token) => token.type === 'Identifier' && token.value === 'as',
-                });
-                if (asToken) {
-                  return fixer.replaceText(asToken, 'satisfies');
-                }
-                return null;
-              },
+              fix: createFix(node),
             });
           }
         },
@@ -75,16 +79,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
-              fix(fixer) {
-                const sourceCode = context.sourceCode;
-                const asToken = sourceCode.getTokenAfter(node.expression, {
-                  filter: (token) => token.type === 'Identifier' && token.value === 'as',
-                });
-                if (asToken) {
-                  return fixer.replaceText(asToken, 'satisfies');
-                }
-                return null;
-              },
+              fix: createFix(node),
             });
             return;
           }
@@ -107,16 +102,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
-              fix(fixer) {
-                const sourceCode = context.sourceCode;
-                const asToken = sourceCode.getTokenAfter(node.expression, {
-                  filter: (token) => token.type === 'Identifier' && token.value === 'as',
-                });
-                if (asToken) {
-                  return fixer.replaceText(asToken, 'satisfies');
-                }
-                return null;
-              },
+              fix: createFix(node),
             });
           }
         }
