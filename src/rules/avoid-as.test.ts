@@ -69,7 +69,7 @@ describe('avoid-as', () => {
       },
     ],
     invalid: [
-      // Invalid: Using as with object literal
+      // Invalid: Using as with object literal (compatible type - suggestion)
       {
         code: `
           interface Config {
@@ -85,7 +85,7 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Using as with empty object literal
+      // Invalid: Using as with empty object literal (compatible type - suggestion)
       {
         code: `
           const obj = {} as Record<string, any>;
@@ -97,7 +97,7 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Using as with nested object properties
+      // Invalid: Using as with nested object properties (compatible type - suggestion)
       {
         code: `
           type User = {
@@ -122,7 +122,7 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Using as with array literal
+      // Invalid: Using as with array literal (compatible type - suggestion)
       {
         code: `
           const arr = [1, 2, 3] as number[];
@@ -134,7 +134,7 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Using as with string literal
+      // Invalid: Using as with string literal (compatible type - suggestion)
       {
         code: `
           const str = "hello" as string;
@@ -146,7 +146,7 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Using as with number literal
+      // Invalid: Using as with number literal (compatible type - suggestion)
       {
         code: `
           const num = 42 as number;
@@ -158,7 +158,7 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Using as with boolean literal
+      // Invalid: Using as with boolean literal (compatible type - suggestion)
       {
         code: `
           const flag = true as boolean;
@@ -167,6 +167,101 @@ describe('avoid-as', () => {
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
+          },
+        ],
+      },
+      // INCOMPATIBLE TYPE ASSERTIONS (problem, not suggestion)
+      // Invalid: String literal as boolean
+      {
+        code: `
+          const val = "hi" as boolean;
+        `,
+        filename: 'invalid8.ts',
+        errors: [
+          {
+            messageId: 'incompatibleTypeAssertion',
+          },
+        ],
+      },
+      // Invalid: Number literal as string
+      {
+        code: `
+          const val = 42 as string;
+        `,
+        filename: 'invalid9.ts',
+        errors: [
+          {
+            messageId: 'incompatibleTypeAssertion',
+          },
+        ],
+      },
+      // Invalid: Boolean literal as number
+      {
+        code: `
+          const val = true as number;
+        `,
+        filename: 'invalid10.ts',
+        errors: [
+          {
+            messageId: 'incompatibleTypeAssertion',
+          },
+        ],
+      },
+      // Invalid: Array literal as object type with incompatible structure
+      {
+        code: `
+          interface User {
+            name: string;
+            age: number;
+          }
+          const val = [1, 2, 3] as User;
+        `,
+        filename: 'invalid11.ts',
+        errors: [
+          {
+            messageId: 'incompatibleTypeAssertion',
+          },
+        ],
+      },
+      // Invalid: Object literal with wrong structure
+      {
+        code: `
+          interface Config {
+            name: string;
+            value: number;
+          }
+          const val = { name: "test", wrongProp: true } as Config;
+        `,
+        filename: 'invalid12.ts',
+        errors: [
+          {
+            messageId: 'incompatibleTypeAssertion',
+          },
+        ],
+      },
+      // Invalid: String literal as specific string literal type that doesn't match
+      {
+        code: `
+          type Status = "active" | "inactive";
+          const val = "pending" as Status;
+        `,
+        filename: 'invalid13.ts',
+        errors: [
+          {
+            messageId: 'incompatibleTypeAssertion',
+          },
+        ],
+      },
+      // Invalid: Number literal as specific number literal type that doesn't match
+      {
+        code: `
+          type Port = 80 | 443 | 8080;
+          const val = 3000 as Port;
+        `,
+        filename: 'invalid14.ts',
+        errors: [
+          {
+            messageId: 'incompatibleTypeAssertion',
           },
         ],
       },
