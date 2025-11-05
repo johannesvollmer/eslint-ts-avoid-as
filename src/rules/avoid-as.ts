@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 
 type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion' | 'requiresTypeInformation';
@@ -26,10 +26,13 @@ export const avoidAs = ESLintUtils.RuleCreator(
     
     // Helper function to create a fixer that replaces 'as' with 'satisfies'
     const createFix = (node: TSESTree.TSAsExpression) => {
-      return (fixer: any) => {
+      return (fixer: TSESLint.RuleFixer) => {
         const sourceCode = context.sourceCode;
         // Get the token after the expression - should be the 'as' keyword
-        const asToken = sourceCode.getTokenAfter(node.expression);
+        // Skip comments and ensure we get the actual keyword token
+        const asToken = sourceCode.getTokenAfter(node.expression, {
+          includeComments: false,
+        });
         if (asToken && asToken.value === 'as') {
           return fixer.replaceText(asToken, 'satisfies');
         }
