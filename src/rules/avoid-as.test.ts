@@ -22,7 +22,7 @@ const ruleTester = new RuleTester({
 describe('avoid-as', () => {
   ruleTester.run('avoid-as', rule, {
     valid: [
-      // Valid: Using satisfies instead of as
+      // Valid: Using satisfies instead of as with object literal
       {
         code: `
           interface Config {
@@ -33,31 +33,39 @@ describe('avoid-as', () => {
         `,
         filename: 'valid1.ts',
       },
-      // Valid: as with non-object expressions
+      // Valid: Using satisfies instead of as with array literal
       {
         code: `
-          const str = "hello" as string;
+          const arr = [1, 2, 3] satisfies number[];
         `,
         filename: 'valid2.ts',
       },
+      // Valid: Using satisfies instead of as with string literal
+      {
+        code: `
+          const str = "hello" satisfies string;
+        `,
+        filename: 'valid3.ts',
+      },
+      // Valid: as with non-literal expressions (function calls, identifiers)
       {
         code: `
           const num = getValue() as number;
         `,
-        filename: 'valid3.ts',
+        filename: 'valid4.ts',
       },
       {
         code: `
-          const arr = [1, 2, 3] as number[];
+          const value = someVariable as SomeType;
         `,
-        filename: 'valid4.ts',
+        filename: 'valid5.ts',
       },
       // Valid: No type assertion at all
       {
         code: `
           const obj = { name: "test", value: 42 };
         `,
-        filename: 'valid5.ts',
+        filename: 'valid6.ts',
       },
     ],
     invalid: [
@@ -73,7 +81,7 @@ describe('avoid-as', () => {
         filename: 'invalid1.ts',
         errors: [
           {
-            messageId: 'avoidAsWithObjectLiteral',
+            messageId: 'avoidAsWithLiteral',
           },
         ],
       },
@@ -85,7 +93,7 @@ describe('avoid-as', () => {
         filename: 'invalid2.ts',
         errors: [
           {
-            messageId: 'avoidAsWithObjectLiteral',
+            messageId: 'avoidAsWithLiteral',
           },
         ],
       },
@@ -110,7 +118,55 @@ describe('avoid-as', () => {
         filename: 'invalid3.ts',
         errors: [
           {
-            messageId: 'avoidAsWithObjectLiteral',
+            messageId: 'avoidAsWithLiteral',
+          },
+        ],
+      },
+      // Invalid: Using as with array literal
+      {
+        code: `
+          const arr = [1, 2, 3] as number[];
+        `,
+        filename: 'invalid4.ts',
+        errors: [
+          {
+            messageId: 'avoidAsWithLiteral',
+          },
+        ],
+      },
+      // Invalid: Using as with string literal
+      {
+        code: `
+          const str = "hello" as string;
+        `,
+        filename: 'invalid5.ts',
+        errors: [
+          {
+            messageId: 'avoidAsWithLiteral',
+          },
+        ],
+      },
+      // Invalid: Using as with number literal
+      {
+        code: `
+          const num = 42 as number;
+        `,
+        filename: 'invalid6.ts',
+        errors: [
+          {
+            messageId: 'avoidAsWithLiteral',
+          },
+        ],
+      },
+      // Invalid: Using as with boolean literal
+      {
+        code: `
+          const flag = true as boolean;
+        `,
+        filename: 'invalid7.ts',
+        errors: [
+          {
+            messageId: 'avoidAsWithLiteral',
           },
         ],
       },
