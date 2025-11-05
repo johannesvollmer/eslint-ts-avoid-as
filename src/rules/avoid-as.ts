@@ -35,9 +35,19 @@ export const avoidAs = ESLintUtils.RuleCreator(
           const tsExpressionNode = services.esTreeNodeToTSNodeMap.get(node.expression);
           const tsTypeAnnotation = services.esTreeNodeToTSNodeMap.get(node.typeAnnotation);
 
+          // Ensure we have valid TypeScript nodes
+          if (!tsExpressionNode || !tsTypeAnnotation || !ts.isTypeNode(tsTypeAnnotation)) {
+            // Fall back to the original behavior if we can't perform type checking
+            context.report({
+              node,
+              messageId: 'avoidAsWithLiteral',
+            });
+            return;
+          }
+
           // Get the type of the expression and the target type
           const expressionType = checker.getTypeAtLocation(tsExpressionNode);
-          const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation as ts.TypeNode);
+          const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
 
           // Check if the expression type is assignable to the target type
           const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
