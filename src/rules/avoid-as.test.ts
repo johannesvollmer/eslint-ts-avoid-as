@@ -78,6 +78,13 @@ describe('avoid-as', () => {
           }
           const config = { name: "test", value: 42 } as Config;
         `,
+        output: `
+          interface Config {
+            name: string;
+            value: number;
+          }
+          const config = { name: "test", value: 42 } satisfies Config;
+        `,
         filename: 'invalid1.ts',
         errors: [
           {
@@ -89,6 +96,9 @@ describe('avoid-as', () => {
       {
         code: `
           const obj = {} as Record<string, any>;
+        `,
+        output: `
+          const obj = {} satisfies Record<string, any>;
         `,
         filename: 'invalid2.ts',
         errors: [
@@ -115,6 +125,22 @@ describe('avoid-as', () => {
             }
           } as User;
         `,
+        output: `
+          type User = {
+            name: string;
+            address: {
+              city: string;
+              zip: string;
+            };
+          };
+          const user = {
+            name: "John",
+            address: {
+              city: "NYC",
+              zip: "10001"
+            }
+          } satisfies User;
+        `,
         filename: 'invalid3.ts',
         errors: [
           {
@@ -126,6 +152,9 @@ describe('avoid-as', () => {
       {
         code: `
           const arr = [1, 2, 3] as number[];
+        `,
+        output: `
+          const arr = [1, 2, 3] satisfies number[];
         `,
         filename: 'invalid4.ts',
         errors: [
@@ -139,6 +168,9 @@ describe('avoid-as', () => {
         code: `
           const str = "hello" as string;
         `,
+        output: `
+          const str = "hello" satisfies string;
+        `,
         filename: 'invalid5.ts',
         errors: [
           {
@@ -151,6 +183,9 @@ describe('avoid-as', () => {
         code: `
           const num = 42 as number;
         `,
+        output: `
+          const num = 42 satisfies number;
+        `,
         filename: 'invalid6.ts',
         errors: [
           {
@@ -162,6 +197,9 @@ describe('avoid-as', () => {
       {
         code: `
           const flag = true as boolean;
+        `,
+        output: `
+          const flag = true satisfies boolean;
         `,
         filename: 'invalid7.ts',
         errors: [

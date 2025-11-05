@@ -18,6 +18,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
       requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
     },
     schema: [],
+    fixable: 'code',
   },
   defaultOptions: [],
   create(context) {
@@ -38,6 +39,16 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
+              fix(fixer) {
+                const sourceCode = context.sourceCode;
+                const asToken = sourceCode.getTokenAfter(node.expression, {
+                  filter: (token) => token.type === 'Identifier' && token.value === 'as',
+                });
+                if (asToken) {
+                  return fixer.replaceText(asToken, 'satisfies');
+                }
+                return null;
+              },
             });
           }
         },
@@ -64,6 +75,16 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
+              fix(fixer) {
+                const sourceCode = context.sourceCode;
+                const asToken = sourceCode.getTokenAfter(node.expression, {
+                  filter: (token) => token.type === 'Identifier' && token.value === 'as',
+                });
+                if (asToken) {
+                  return fixer.replaceText(asToken, 'satisfies');
+                }
+                return null;
+              },
             });
             return;
           }
@@ -86,6 +107,16 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
+              fix(fixer) {
+                const sourceCode = context.sourceCode;
+                const asToken = sourceCode.getTokenAfter(node.expression, {
+                  filter: (token) => token.type === 'Identifier' && token.value === 'as',
+                });
+                if (asToken) {
+                  return fixer.replaceText(asToken, 'satisfies');
+                }
+                return null;
+              },
             });
           }
         }
