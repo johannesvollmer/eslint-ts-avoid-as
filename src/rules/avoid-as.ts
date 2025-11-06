@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 
 type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion' | 'requiresTypeInformation';
@@ -18,10 +18,27 @@ export const avoidAs = ESLintUtils.RuleCreator(
       requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
     },
     schema: [],
+    fixable: 'code',
   },
   defaultOptions: [],
   create(context) {
     const services = ESLintUtils.getParserServices(context, true);
+    
+    // Helper function to create a fixer that replaces 'as' with 'satisfies'
+    const createFix = (node: TSESTree.TSAsExpression) => {
+      return (fixer: TSESLint.RuleFixer) => {
+        const sourceCode = context.sourceCode;
+        // Get the token after the expression - should be the 'as' keyword
+        // Skip comments and ensure we get the actual keyword token
+        const asToken = sourceCode.getTokenAfter(node.expression, {
+          includeComments: false,
+        });
+        if (asToken && asToken.value === 'as') {
+          return fixer.replaceText(asToken, 'satisfies');
+        }
+        return null;
+      };
+    };
     
     // Check if full type information is available
     if (!services.program) {
@@ -38,6 +55,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
+              fix: createFix(node),
             });
           }
         },
@@ -64,6 +82,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
+              fix: createFix(node),
             });
             return;
           }
@@ -86,6 +105,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
             context.report({
               node,
               messageId: 'avoidAsWithLiteral',
+              fix: createFix(node),
             });
           }
         }
