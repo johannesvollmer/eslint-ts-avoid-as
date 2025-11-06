@@ -22,8 +22,8 @@ const ruleTester = new RuleTester({
 describe('avoid-as', () => {
   ruleTester.run('avoid-as', rule, {
     valid: [
-      // Valid: Using satisfies instead of as with object literal
       {
+        filename: 'using-satisfies-with-object-literal.ts',
         code: `
           interface Config {
             name: string;
@@ -31,133 +31,120 @@ describe('avoid-as', () => {
           }
           const config = { name: "test", value: 42 } satisfies Config;
         `,
-        filename: 'valid1.ts',
       },
-      // Valid: Using satisfies instead of as with array literal
       {
+        filename: 'using-satisfies-with-array-literal.ts',
         code: `
           const arr = [1, 2, 3] satisfies number[];
         `,
-        filename: 'valid2.ts',
       },
-      // Valid: Using satisfies instead of as with string literal
       {
+        filename: 'using-satisfies-with-string-literal.ts',
         code: `
           const str = "hello" satisfies string;
         `,
-        filename: 'valid3.ts',
       },
-      // Valid: as with non-literal expressions (function calls, identifiers)
       {
+        filename: 'as-with-function-call.ts',
         code: `
           const num = getValue() as number;
         `,
-        filename: 'valid4.ts',
       },
       {
+        filename: 'as-with-variable.ts',
         code: `
           const value = someVariable as SomeType;
         `,
-        filename: 'valid5.ts',
       },
-      // Valid: No type assertion at all
       {
+        filename: 'no-type-assertion.ts',
         code: `
           const obj = { name: "test", value: 42 };
         `,
-        filename: 'valid6.ts',
       },
-      // Valid: as const (const assertions are allowed)
       {
+        filename: 'as-const-with-object.ts',
         code: `
           const config = { name: "test", value: 42 } as const;
         `,
-        filename: 'valid7.ts',
       },
       {
+        filename: 'as-const-with-array.ts',
         code: `
           const arr = [1, 2, 3] as const;
         `,
-        filename: 'valid8.ts',
       },
       {
+        filename: 'as-const-with-tuple.ts',
         code: `
           const tuple = ["hello", 42, true] as const;
         `,
-        filename: 'valid9.ts',
       },
-      // Valid: as with any (non-literal expressions only - these are identifiers/calls)
       {
+        filename: 'as-any-with-function-call.ts',
         code: `
           const data = fetchData() as any;
         `,
-        filename: 'valid10.ts',
       },
       {
+        filename: 'as-unknown-with-variable.ts',
         code: `
           const result = someValue as unknown;
         `,
-        filename: 'valid11.ts',
       },
-      // Valid: as in null/undefined checks with non-literals
       {
+        filename: 'as-with-nullable-variable.ts',
         code: `
           const value = maybeValue as string | null;
         `,
-        filename: 'valid12.ts',
       },
       {
+        filename: 'as-with-optional-variable.ts',
         code: `
           const item = getItem() as undefined | number;
         `,
-        filename: 'valid13.ts',
       },
-      // Valid: as with template literal expressions (non-literal)
       {
+        filename: 'as-with-template-literal.ts',
         code: `
           const id = \`user-\${userId}\` as string;
         `,
-        filename: 'valid14.ts',
       },
-      // Valid: as with function expressions
       {
+        filename: 'as-with-function-expression.ts',
         code: `
           const fn = function() { return 42; } as () => number;
         `,
-        filename: 'valid15.ts',
       },
       {
+        filename: 'as-with-arrow-function.ts',
         code: `
           const arrow = (() => 42) as () => number;
         `,
-        filename: 'valid16.ts',
       },
-      // Valid: as with class instances
       {
+        filename: 'as-with-class-instance.ts',
         code: `
           class MyClass {}
           const instance = new MyClass() as MyClass;
         `,
-        filename: 'valid17.ts',
       },
-      // Valid: as with conditional expressions
       {
+        filename: 'as-with-conditional-expression.ts',
         code: `
           const value = (condition ? "yes" : "no") as string;
         `,
-        filename: 'valid18.ts',
       },
-      // Valid: as with typeof expressions
       {
+        filename: 'as-with-typeof-expression.ts',
         code: `
           const t = typeof value as "string" | "number";
         `,
-        filename: 'valid19.ts',
       },
     ],
     invalid: [
-      // Invalid: Using as with object literal (compatible type - suggestion)
       {
+        filename: 'as-with-object-literal-compatible.ts',
         code: `
           interface Config {
             name: string;
@@ -172,30 +159,28 @@ describe('avoid-as', () => {
           }
           const config = { name: "test", value: 42 } satisfies Config;
         `,
-        filename: 'invalid1.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with empty object literal (compatible type - suggestion)
       {
+        filename: 'as-with-empty-object.ts',
         code: `
           const obj = {} as Record<string, any>;
         `,
         output: `
           const obj = {} satisfies Record<string, any>;
         `,
-        filename: 'invalid2.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with nested object properties (compatible type - suggestion)
       {
+        filename: 'as-with-nested-object.ts',
         code: `
           type User = {
             name: string;
@@ -228,165 +213,154 @@ describe('avoid-as', () => {
             }
           } satisfies User;
         `,
-        filename: 'invalid3.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with array literal (compatible type - suggestion)
       {
+        filename: 'as-with-array-literal.ts',
         code: `
           const arr = [1, 2, 3] as number[];
         `,
         output: `
           const arr = [1, 2, 3] satisfies number[];
         `,
-        filename: 'invalid4.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with string literal (compatible type - suggestion)
       {
+        filename: 'as-with-string-literal.ts',
         code: `
           const str = "hello" as string;
         `,
         output: `
           const str = "hello" satisfies string;
         `,
-        filename: 'invalid5.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with number literal (compatible type - suggestion)
       {
+        filename: 'as-with-number-literal.ts',
         code: `
           const num = 42 as number;
         `,
         output: `
           const num = 42 satisfies number;
         `,
-        filename: 'invalid6.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with boolean literal (compatible type - suggestion)
       {
+        filename: 'as-with-boolean-literal.ts',
         code: `
           const flag = true as boolean;
         `,
         output: `
           const flag = true satisfies boolean;
         `,
-        filename: 'invalid7.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with null literal (compatible type - suggestion)
       {
+        filename: 'as-with-null-literal.ts',
         code: `
           const val = null as null;
         `,
         output: `
           const val = null satisfies null;
         `,
-        filename: 'invalid8.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with bigint literal (compatible type - suggestion)
       {
+        filename: 'as-with-bigint-literal.ts',
         code: `
           const big = 100n as bigint;
         `,
         output: `
           const big = 100n satisfies bigint;
         `,
-        filename: 'invalid9.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with readonly array (compatible type - suggestion)
       {
+        filename: 'as-with-readonly-array.ts',
         code: `
           const arr = [1, 2, 3] as readonly number[];
         `,
         output: `
           const arr = [1, 2, 3] satisfies readonly number[];
         `,
-        filename: 'invalid10.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with tuple type (compatible type - suggestion)
       {
+        filename: 'as-with-tuple-type.ts',
         code: `
           const tuple = ["hello", 42] as [string, number];
         `,
         output: `
           const tuple = ["hello", 42] satisfies [string, number];
         `,
-        filename: 'invalid11.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with union type (compatible type - suggestion)
       {
+        filename: 'as-with-union-type.ts',
         code: `
           const val = "hello" as string | number;
         `,
         output: `
           const val = "hello" satisfies string | number;
         `,
-        filename: 'invalid12.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with nested arrays (compatible type - suggestion)
       {
+        filename: 'as-with-nested-arrays.ts',
         code: `
           const matrix = [[1, 2], [3, 4]] as number[][];
         `,
         output: `
           const matrix = [[1, 2], [3, 4]] satisfies number[][];
         `,
-        filename: 'invalid13.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with object containing methods (compatible type - suggestion)
       {
+        filename: 'as-with-object-containing-methods.ts',
         code: `
           interface Calculator {
             add: (a: number, b: number) => number;
@@ -399,30 +373,28 @@ describe('avoid-as', () => {
           }
           const calc = { add: (a: number, b: number) => a + b } satisfies Calculator;
         `,
-        filename: 'invalid14.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with empty array (compatible type - suggestion)
       {
+        filename: 'as-with-empty-array.ts',
         code: `
           const arr = [] as string[];
         `,
         output: `
           const arr = [] satisfies string[];
         `,
-        filename: 'invalid15.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with specific string literal type (compatible type - suggestion)
       {
+        filename: 'as-with-specific-string-literal-type.ts',
         code: `
           type Color = "red" | "green" | "blue";
           const color = "red" as Color;
@@ -431,15 +403,14 @@ describe('avoid-as', () => {
           type Color = "red" | "green" | "blue";
           const color = "red" satisfies Color;
         `,
-        filename: 'invalid16.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with specific number literal type (compatible type - suggestion)
       {
+        filename: 'as-with-specific-number-literal-type.ts',
         code: `
           type Version = 1 | 2 | 3;
           const version = 2 as Version;
@@ -448,15 +419,14 @@ describe('avoid-as', () => {
           type Version = 1 | 2 | 3;
           const version = 2 satisfies Version;
         `,
-        filename: 'invalid17.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with intersection type (compatible type - suggestion)
       {
+        filename: 'as-with-intersection-type.ts',
         code: `
           type HasName = { name: string };
           type HasAge = { age: number };
@@ -467,15 +437,14 @@ describe('avoid-as', () => {
           type HasAge = { age: number };
           const person = { name: "John", age: 30 } satisfies HasName & HasAge;
         `,
-        filename: 'invalid18.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with optional properties (compatible type - suggestion)
       {
+        filename: 'as-with-optional-properties.ts',
         code: `
           interface User {
             name: string;
@@ -490,35 +459,31 @@ describe('avoid-as', () => {
           }
           const user = { name: "Alice" } satisfies User;
         `,
-        filename: 'invalid19.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Using as with index signature (compatible type - suggestion)
       {
+        filename: 'as-with-index-signature.ts',
         code: `
           const dict = { key1: "value1", key2: "value2" } as { [key: string]: string };
         `,
         output: `
           const dict = { key1: "value1", key2: "value2" } satisfies { [key: string]: string };
         `,
-        filename: 'invalid20.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // INCOMPATIBLE TYPE ASSERTIONS (problem, not suggestion)
-      // Invalid: String literal as boolean
       {
+        filename: 'string-literal-as-boolean-incompatible.ts',
         code: `
           const val = "hi" as boolean;
         `,
-        filename: 'invalid21.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -529,12 +494,11 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Number literal as string
       {
+        filename: 'number-literal-as-string-incompatible.ts',
         code: `
           const val = 42 as string;
         `,
-        filename: 'invalid22.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -545,12 +509,11 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Boolean literal as number
       {
+        filename: 'boolean-literal-as-number-incompatible.ts',
         code: `
           const val = true as number;
         `,
-        filename: 'invalid23.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -561,8 +524,8 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Array literal as object type with incompatible structure
       {
+        filename: 'array-literal-as-object-incompatible.ts',
         code: `
           interface User {
             name: string;
@@ -570,7 +533,6 @@ describe('avoid-as', () => {
           }
           const val = [1, 2, 3] as User;
         `,
-        filename: 'invalid24.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -581,8 +543,8 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Object literal with wrong structure
       {
+        filename: 'object-literal-with-wrong-structure.ts',
         code: `
           interface Config {
             name: string;
@@ -590,20 +552,18 @@ describe('avoid-as', () => {
           }
           const val = { name: "test", wrongProp: true } as Config;
         `,
-        filename: 'invalid25.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
           },
         ],
       },
-      // Invalid: String literal as specific string literal type that doesn't match
       {
+        filename: 'string-literal-wrong-union-member.ts',
         code: `
           type Status = "active" | "inactive";
           const val = "pending" as Status;
         `,
-        filename: 'invalid26.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -614,13 +574,12 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Number literal as specific number literal type that doesn't match
       {
+        filename: 'number-literal-wrong-union-member.ts',
         code: `
           type Port = 80 | 443 | 8080;
           const val = 3000 as Port;
         `,
-        filename: 'invalid27.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -631,15 +590,14 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Null as non-nullable object type
       {
+        filename: 'null-as-non-nullable-object.ts',
         code: `
           interface User {
             name: string;
           }
           const val = null as User;
         `,
-        filename: 'invalid28.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -650,24 +608,22 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Object literal as primitive
       {
+        filename: 'object-literal-as-primitive.ts',
         code: `
           const val = { x: 1 } as number;
         `,
-        filename: 'invalid29.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
           },
         ],
       },
-      // Invalid: Array as string
       {
+        filename: 'array-as-string.ts',
         code: `
           const val = [1, 2, 3] as string;
         `,
-        filename: 'invalid30.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -678,8 +634,8 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Empty object as interface with required properties (compatible - TypeScript allows this)
       {
+        filename: 'empty-object-as-interface-with-required-properties.ts',
         code: `
           interface Required {
             id: number;
@@ -694,45 +650,41 @@ describe('avoid-as', () => {
           }
           const val = {} satisfies Required;
         `,
-        filename: 'invalid31.ts',
         errors: [
           {
             messageId: 'avoidAsWithLiteral',
           },
         ],
       },
-      // Invalid: Wrong tuple length
       {
+        filename: 'wrong-tuple-length.ts',
         code: `
           const val = [1, 2, 3] as [number, number];
         `,
-        filename: 'invalid32.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
           },
         ],
       },
-      // Invalid: Wrong tuple element types
       {
+        filename: 'wrong-tuple-element-types.ts',
         code: `
           const val = ["hello", "world"] as [string, number];
         `,
-        filename: 'invalid33.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
           },
         ],
       },
-      // Invalid: Incompatible union types
       {
+        filename: 'incompatible-union-types.ts',
         code: `
           type A = "a" | "b";
           type B = "c" | "d";
           const val = "a" as B;
         `,
-        filename: 'invalid34.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -743,8 +695,8 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Incompatible interfaces
       {
+        filename: 'incompatible-interfaces.ts',
         code: `
           interface A {
             propA: string;
@@ -754,19 +706,17 @@ describe('avoid-as', () => {
           }
           const val = { propA: "test" } as B;
         `,
-        filename: 'invalid35.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
           },
         ],
       },
-      // Invalid: Number as boolean
       {
+        filename: 'number-as-boolean.ts',
         code: `
           const val = 1 as boolean;
         `,
-        filename: 'invalid36.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -777,12 +727,11 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: Boolean as string
       {
+        filename: 'boolean-as-string.ts',
         code: `
           const val = false as string;
         `,
-        filename: 'invalid37.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
@@ -793,12 +742,11 @@ describe('avoid-as', () => {
           },
         ],
       },
-      // Invalid: String as number array
       {
+        filename: 'string-as-number-array.ts',
         code: `
           const val = "hello" as number[];
         `,
-        filename: 'invalid38.ts',
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
