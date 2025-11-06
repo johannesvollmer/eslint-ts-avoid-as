@@ -1,7 +1,7 @@
 import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 
-type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion' | 'requiresTypeInformation' | 'avoidAsWidening';
+type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion' | 'requiresTypeInformation';
 
 const isConstAssertion = (node: TSESTree.TSAsExpression): boolean => {
   return (
@@ -44,7 +44,6 @@ export const avoidAs = ESLintUtils.RuleCreator(
       avoidAsWithLiteral: 'Avoid using `as` for type assertions on literals. Use `satisfies` instead.',
       incompatibleTypeAssertion: 'Type assertion is invalid: Type \'{{sourceType}}\' is not assignable to type \'{{targetType}}\'.',
       requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
-      avoidAsWidening: 'Avoid using `as` to widen the type. Instead, declare a new variable with an explicit type annotation.',
     },
     schema: [],
     fixable: 'code',
@@ -94,25 +93,11 @@ export const avoidAs = ESLintUtils.RuleCreator(
           },
         });
       } else {
-        // Check if this is a widening type assertion
-        // Widening occurs when:
-        // 1. expressionType is assignable to targetType (already confirmed above)
-        // 2. targetType is NOT assignable back to expressionType (checking below)
-        // Example: "hello" is assignable to string, but string is NOT assignable to "hello"
-        const isWidening = !checker.isTypeAssignableTo(targetType, expressionType);
-        
-        if (isWidening) {
-          context.report({
-            node,
-            messageId: 'avoidAsWidening',
-          });
-        } else {
-          context.report({
-            node,
-            messageId: 'avoidAsWithLiteral',
-            fix: createFix(node, context),
-          });
-        }
+        context.report({
+          node,
+          messageId: 'avoidAsWithLiteral',
+          fix: createFix(node, context),
+        });
       }
     };
 
