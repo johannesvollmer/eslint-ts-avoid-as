@@ -238,12 +238,9 @@ describe('avoid-as', () => {
         code: `
           const str = "hello" as string;
         `,
-        output: `
-          const str = "hello" satisfies string;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -252,12 +249,9 @@ describe('avoid-as', () => {
         code: `
           const num = 42 as number;
         `,
-        output: `
-          const num = 42 satisfies number;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -266,12 +260,9 @@ describe('avoid-as', () => {
         code: `
           const flag = true as boolean;
         `,
-        output: `
-          const flag = true satisfies boolean;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -294,12 +285,9 @@ describe('avoid-as', () => {
         code: `
           const big = 100n as bigint;
         `,
-        output: `
-          const big = 100n satisfies bigint;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -308,12 +296,9 @@ describe('avoid-as', () => {
         code: `
           const arr = [1, 2, 3] as readonly number[];
         `,
-        output: `
-          const arr = [1, 2, 3] satisfies readonly number[];
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -336,12 +321,9 @@ describe('avoid-as', () => {
         code: `
           const val = "hello" as string | number;
         `,
-        output: `
-          const val = "hello" satisfies string | number;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -384,12 +366,9 @@ describe('avoid-as', () => {
         code: `
           const arr = [] as string[];
         `,
-        output: `
-          const arr = [] satisfies string[];
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -399,13 +378,9 @@ describe('avoid-as', () => {
           type Color = "red" | "green" | "blue";
           const color = "red" as Color;
         `,
-        output: `
-          type Color = "red" | "green" | "blue";
-          const color = "red" satisfies Color;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -415,13 +390,9 @@ describe('avoid-as', () => {
           type Version = 1 | 2 | 3;
           const version = 2 as Version;
         `,
-        output: `
-          type Version = 1 | 2 | 3;
-          const version = 2 satisfies Version;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -452,16 +423,9 @@ describe('avoid-as', () => {
           }
           const user = { name: "Alice" } as User;
         `,
-        output: `
-          interface User {
-            name: string;
-            email?: string;
-          }
-          const user = { name: "Alice" } satisfies User;
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -470,12 +434,9 @@ describe('avoid-as', () => {
         code: `
           const dict = { key1: "value1", key2: "value2" } as { [key: string]: string };
         `,
-        output: `
-          const dict = { key1: "value1", key2: "value2" } satisfies { [key: string]: string };
-        `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'avoidAsWidening',
           },
         ],
       },
@@ -754,6 +715,52 @@ describe('avoid-as', () => {
               sourceType: '"hello"',
               targetType: 'number[]',
             },
+          },
+        ],
+      },
+      // Additional test cases for widening type assertions
+      {
+        filename: 'widening-string-literal-to-string.ts',
+        code: `
+          const msg = "hello world" as string;
+        `,
+        errors: [
+          {
+            messageId: 'avoidAsWidening',
+          },
+        ],
+      },
+      {
+        filename: 'widening-number-literal-to-number.ts',
+        code: `
+          const count = 10 as number;
+        `,
+        errors: [
+          {
+            messageId: 'avoidAsWidening',
+          },
+        ],
+      },
+      {
+        filename: 'widening-array-to-readonly.ts',
+        code: `
+          const items = [1, 2, 3] as readonly number[];
+        `,
+        errors: [
+          {
+            messageId: 'avoidAsWidening',
+          },
+        ],
+      },
+      {
+        filename: 'widening-specific-literal-to-union.ts',
+        code: `
+          type Mode = "dev" | "prod" | "test";
+          const env = "dev" as Mode;
+        `,
+        errors: [
+          {
+            messageId: 'avoidAsWidening',
           },
         ],
       },
