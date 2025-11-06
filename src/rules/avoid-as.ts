@@ -46,6 +46,15 @@ export const avoidAs = ESLintUtils.RuleCreator(
       // but cannot check type assignability
       return {
         TSAsExpression(node: TSESTree.TSAsExpression) {
+          // Skip const assertions (as const) - these are valid and useful
+          if (
+            node.typeAnnotation.type === 'TSTypeReference' &&
+            node.typeAnnotation.typeName.type === 'Identifier' &&
+            node.typeAnnotation.typeName.name === 'const'
+          ) {
+            return;
+          }
+
           // Check if the expression being cast is a literal
           if (
             node.expression.type === 'ObjectExpression' ||
@@ -66,6 +75,15 @@ export const avoidAs = ESLintUtils.RuleCreator(
 
     return {
       TSAsExpression(node: TSESTree.TSAsExpression) {
+        // Skip const assertions (as const) - these are valid and useful
+        if (
+          node.typeAnnotation.type === 'TSTypeReference' &&
+          node.typeAnnotation.typeName.type === 'Identifier' &&
+          node.typeAnnotation.typeName.name === 'const'
+        ) {
+          return;
+        }
+
         // Check if the expression being cast is a literal (object, array, string, number, etc.)
         if (
           node.expression.type === 'ObjectExpression' ||
