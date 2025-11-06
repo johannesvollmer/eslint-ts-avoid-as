@@ -95,6 +95,10 @@ export const avoidAs = ESLintUtils.RuleCreator(
         });
       } else {
         // Check if this is a widening type assertion
+        // Widening occurs when:
+        // 1. expressionType is assignable to targetType (already confirmed above)
+        // 2. targetType is NOT assignable back to expressionType (checking below)
+        // Example: "hello" is assignable to string, but string is NOT assignable to "hello"
         const isWidening = !checker.isTypeAssignableTo(targetType, expressionType);
         
         if (isWidening) {
