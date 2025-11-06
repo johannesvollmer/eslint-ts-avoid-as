@@ -3,6 +3,34 @@ import * as ts from 'typescript';
 
 type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion' | 'requiresTypeInformation';
 
+const isConstAssertion = (node: TSESTree.TSAsExpression): boolean => {
+  return (
+    node.typeAnnotation.type === 'TSTypeReference' &&
+    node.typeAnnotation.typeName.type === 'Identifier' &&
+    node.typeAnnotation.typeName.name === 'const'
+  );
+};
+
+const isLiteralExpression = (node: TSESTree.Expression): boolean => {
+  return (
+    node.type === 'ObjectExpression' ||
+    node.type === 'ArrayExpression' ||
+    node.type === 'Literal'
+  );
+};
+
+const createFix = (node: TSESTree.TSAsExpression, context: TSESLint.RuleContext<MessageIds, []>) => {
+  return (fixer: TSESLint.RuleFixer) => {
+    const asToken = context.sourceCode.getTokenAfter(node.expression, {
+      includeComments: false,
+    });
+    if (asToken && asToken.value === 'as') {
+      return fixer.replaceText(asToken, 'satisfies');
+    }
+    return null;
+  };
+};
+
 export const avoidAs = ESLintUtils.RuleCreator(
   (name) => `https://github.com/johannesvollmer/eslint-ts-avoid-as#${name}`
 )<[], MessageIds>({
@@ -24,118 +52,57 @@ export const avoidAs = ESLintUtils.RuleCreator(
   create(context) {
     const services = ESLintUtils.getParserServices(context, true);
     
-    // Helper function to create a fixer that replaces 'as' with 'satisfies'
-    const createFix = (node: TSESTree.TSAsExpression) => {
-      return (fixer: TSESLint.RuleFixer) => {
-        const sourceCode = context.sourceCode;
-        // Get the token after the expression - should be the 'as' keyword
-        // Skip comments and ensure we get the actual keyword token
-        const asToken = sourceCode.getTokenAfter(node.expression, {
-          includeComments: false,
+    const handleAsExpression = (node: TSESTree.TSAsExpression) => {
+      if (isConstAssertion(node) || !isLiteralExpression(node.expression)) {
+        return;
+      }
+
+      if (!services.program) {
+        context.report({
+          node,
+          messageId: 'avoidAsWithLiteral',
+          fix: createFix(node, context),
         });
-        if (asToken && asToken.value === 'as') {
-          return fixer.replaceText(asToken, 'satisfies');
-        }
-        return null;
-      };
+        return;
+      }
+
+      const checker = services.program.getTypeChecker();
+      const tsExpressionNode = services.esTreeNodeToTSNodeMap.get(node.expression);
+      const tsTypeAnnotation = services.esTreeNodeToTSNodeMap.get(node.typeAnnotation);
+
+      if (!tsExpressionNode || !tsTypeAnnotation || !ts.isTypeNode(tsTypeAnnotation)) {
+        context.report({
+          node,
+          messageId: 'avoidAsWithLiteral',
+          fix: createFix(node, context),
+        });
+        return;
+      }
+
+      const expressionType = checker.getTypeAtLocation(tsExpressionNode);
+      const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
+      const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
+
+      if (!isAssignable) {
+        context.report({
+          node,
+          messageId: 'incompatibleTypeAssertion',
+          data: {
+            sourceType: checker.typeToString(expressionType),
+            targetType: checker.typeToString(targetType),
+          },
+        });
+      } else {
+        context.report({
+          node,
+          messageId: 'avoidAsWithLiteral',
+          fix: createFix(node, context),
+        });
+      }
     };
-    
-    // Check if full type information is available
-    if (!services.program) {
-      // If no type information is available, we can only detect literal assertions
-      // but cannot check type assignability
-      return {
-        TSAsExpression(node: TSESTree.TSAsExpression) {
-          // Skip const assertions (as const) - these are valid and useful
-          if (
-            node.typeAnnotation.type === 'TSTypeReference' &&
-            node.typeAnnotation.typeName.type === 'Identifier' &&
-            node.typeAnnotation.typeName.name === 'const'
-          ) {
-            return;
-          }
-
-          // Check if the expression being cast is a literal
-          if (
-            node.expression.type === 'ObjectExpression' ||
-            node.expression.type === 'ArrayExpression' ||
-            node.expression.type === 'Literal'
-          ) {
-            context.report({
-              node,
-              messageId: 'avoidAsWithLiteral',
-              fix: createFix(node),
-            });
-          }
-        },
-      };
-    }
-
-    const checker = services.program.getTypeChecker();
 
     return {
-      TSAsExpression(node: TSESTree.TSAsExpression) {
-        // Skip const assertions (as const) - these are valid and useful
-        if (
-          node.typeAnnotation.type === 'TSTypeReference' &&
-          node.typeAnnotation.typeName.type === 'Identifier' &&
-          node.typeAnnotation.typeName.name === 'const'
-        ) {
-          return;
-        }
-
-        // Check if the expression being cast is a literal (object, array, string, number, etc.)
-        if (
-          node.expression.type === 'ObjectExpression' ||
-          node.expression.type === 'ArrayExpression' ||
-          node.expression.type === 'Literal'
-        ) {
-          // Get TypeScript nodes for type checking
-          const tsExpressionNode = services.esTreeNodeToTSNodeMap.get(node.expression);
-          const tsTypeAnnotation = services.esTreeNodeToTSNodeMap.get(node.typeAnnotation);
-
-          // Ensure we have valid TypeScript nodes
-          if (!tsExpressionNode || !tsTypeAnnotation || !ts.isTypeNode(tsTypeAnnotation)) {
-            // Fall back to the original behavior if we can't perform type checking
-            context.report({
-              node,
-              messageId: 'avoidAsWithLiteral',
-              fix: createFix(node),
-            });
-            return;
-          }
-
-          // Get the type of the expression and the target type
-          const expressionType = checker.getTypeAtLocation(tsExpressionNode);
-          const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
-
-          // Check if the expression type is assignable to the target type
-          const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
-
-          if (!isAssignable) {
-            // Get type strings for the error message
-            const sourceTypeString = checker.typeToString(expressionType);
-            const targetTypeString = checker.typeToString(targetType);
-            
-            // Report as a problem if types are incompatible
-            context.report({
-              node,
-              messageId: 'incompatibleTypeAssertion',
-              data: {
-                sourceType: sourceTypeString,
-                targetType: targetTypeString,
-              },
-            });
-          } else {
-            // Report as a suggestion to use satisfies instead
-            context.report({
-              node,
-              messageId: 'avoidAsWithLiteral',
-              fix: createFix(node),
-            });
-          }
-        }
-      },
+      TSAsExpression: handleAsExpression,
     };
   },
 });
