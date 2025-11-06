@@ -14,7 +14,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
     },
     messages: {
       avoidAsWithLiteral: 'Avoid using `as` for type assertions on literals. Use `satisfies` instead.',
-      incompatibleTypeAssertion: 'Type assertion is invalid: the literal type cannot be assigned to the target type.',
+      incompatibleTypeAssertion: 'Type assertion is invalid: Type \'{{sourceType}}\' is not assignable to type \'{{targetType}}\'.',
       requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
     },
     schema: [],
@@ -95,10 +95,18 @@ export const avoidAs = ESLintUtils.RuleCreator(
           const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
 
           if (!isAssignable) {
+            // Get type strings for the error message
+            const sourceTypeString = checker.typeToString(expressionType);
+            const targetTypeString = checker.typeToString(targetType);
+            
             // Report as a problem if types are incompatible
             context.report({
               node,
               messageId: 'incompatibleTypeAssertion',
+              data: {
+                sourceType: sourceTypeString,
+                targetType: targetTypeString,
+              },
             });
           } else {
             // Report as a suggestion to use satisfies instead

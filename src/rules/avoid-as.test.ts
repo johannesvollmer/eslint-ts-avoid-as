@@ -218,6 +218,10 @@ describe('avoid-as', () => {
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
+            data: {
+              sourceType: '"hi"',
+              targetType: 'boolean',
+            },
           },
         ],
       },
@@ -230,6 +234,10 @@ describe('avoid-as', () => {
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
+            data: {
+              sourceType: '42',
+              targetType: 'string',
+            },
           },
         ],
       },
@@ -242,6 +250,10 @@ describe('avoid-as', () => {
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
+            data: {
+              sourceType: 'true',
+              targetType: 'number',
+            },
           },
         ],
       },
@@ -258,6 +270,10 @@ describe('avoid-as', () => {
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
+            data: {
+              sourceType: 'number[]',
+              targetType: 'User',
+            },
           },
         ],
       },
@@ -287,6 +303,10 @@ describe('avoid-as', () => {
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
+            data: {
+              sourceType: '"pending"',
+              targetType: 'Status',
+            },
           },
         ],
       },
@@ -300,6 +320,10 @@ describe('avoid-as', () => {
         errors: [
           {
             messageId: 'incompatibleTypeAssertion',
+            data: {
+              sourceType: '3000',
+              targetType: 'Port',
+            },
           },
         ],
       },
