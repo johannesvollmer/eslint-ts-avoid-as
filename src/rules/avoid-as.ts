@@ -70,7 +70,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
       const tsExpressionNode = services.esTreeNodeToTSNodeMap.get(node.expression);
       const tsTypeAnnotation = services.esTreeNodeToTSNodeMap.get(node.typeAnnotation);
 
-      if (!tsExpressionNode || !tsTypeAnnotation || !ts.isTypeNode(tsTypeAnnotation)) {
+      if (!tsExpressionNode || !tsTypeAnnotation) {
         context.report({
           node,
           messageId: 'requiresTypeInformation',
@@ -80,7 +80,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
       }
 
       const expressionType = checker.getTypeAtLocation(tsExpressionNode);
-      const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
+      const targetType = checker.getTypeAtLocation(tsTypeAnnotation);
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
 
       if (!isAssignable) {
