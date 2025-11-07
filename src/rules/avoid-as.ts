@@ -38,11 +38,11 @@ export const avoidAs = ESLintUtils.RuleCreator(
   meta: {
     type: 'problem',
     docs: {
-      description: 'Disallow using `as` for type assertions on literals; use `satisfies` instead',
+      description: 'Warn about using `as` for type assertions on literals; use `satisfies` instead',
     },
     messages: {
       avoidAsWithLiteral: 'Avoid using `as` for type assertions on literals. Use `satisfies` instead.',
-      incompatibleTypeAssertion: 'Type assertion is invalid: Type \'{{sourceType}}\' is not assignable to type \'{{targetType}}\'.',
+      incompatibleTypeAssertion: 'This literal does not match the declared type. Use the `satisfies` keyword instead of `as` to enable type checking.',
       requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
     },
     schema: [],
@@ -87,10 +87,6 @@ export const avoidAs = ESLintUtils.RuleCreator(
         context.report({
           node,
           messageId: 'incompatibleTypeAssertion',
-          data: {
-            sourceType: checker.typeToString(expressionType),
-            targetType: checker.typeToString(targetType),
-          },
         });
       } else {
         context.report({
