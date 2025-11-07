@@ -42,7 +42,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
     },
     messages: {
       avoidAsWithLiteral: 'Avoid using `as` for type assertions on literals. Use `satisfies` instead.',
-      incompatibleTypeAssertion: 'Type assertion is invalid. Use the `satisfies` keyword instead of `as` to find out more.',
+      incompatibleTypeAssertion: 'This literal does not match the declared type. Use the `satisfies` keyword instead of `as` to enable type checking.',
       requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
     },
     schema: [],
