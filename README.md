@@ -105,11 +105,15 @@ module.exports = {
 
 This plugin requires type information, so make sure your ESLint config uses `@typescript-eslint/parser`:
 
+**Using ESM:**
 ```javascript
+import tsParser from '@typescript-eslint/parser';
+import tsAvoidAs from 'eslint-ts-avoid-as';
+
 export default [
   {
     languageOptions: {
-      parser: require('@typescript-eslint/parser'),
+      parser: tsParser,
       parserOptions: {
         project: './tsconfig.json',
       },
@@ -122,6 +126,20 @@ export default [
     },
   },
 ];
+```
+
+**Using CommonJS:**
+```javascript
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: './tsconfig.json',
+  },
+  plugins: ['ts-avoid-as'],
+  rules: {
+    'ts-avoid-as/avoid-as': 'error',
+  },
+};
 ```
 
 ## 📋 Rule Details
@@ -200,9 +218,11 @@ You might want to disable this rule if:
 
 ## 🐛 Compatibility
 
-- **TypeScript**: >= 5.0.0 (requires `satisfies` operator support from TS 4.9+)
+- **TypeScript**: >= 5.0.0 (uses `satisfies` operator and advanced type checking features)
 - **ESLint**: >= 8.0.0
 - **Node.js**: >= 18.0.0
+
+> **Note**: While the `satisfies` operator was introduced in TypeScript 4.9, this plugin requires TypeScript 5.0+ for full compatibility with its type checking features.
 
 ## 💡 Examples
 
