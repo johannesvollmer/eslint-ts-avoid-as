@@ -60,7 +60,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
       if (!services.program) {
         context.report({
           node,
-          messageId: 'avoidAsWithLiteral',
+          messageId: 'requiresTypeInformation',
           fix: createFix(node, context),
         });
         return;
@@ -73,7 +73,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
       if (!tsExpressionNode || !tsTypeAnnotation || !ts.isTypeNode(tsTypeAnnotation)) {
         context.report({
           node,
-          messageId: 'avoidAsWithLiteral',
+          messageId: 'requiresTypeInformation',
           fix: createFix(node, context),
         });
         return;
