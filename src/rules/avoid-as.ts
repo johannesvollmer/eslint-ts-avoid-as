@@ -34,7 +34,7 @@ const createFix = (node: TSESTree.TSAsExpression, context: TSESLint.RuleContext<
 export const avoidAs = ESLintUtils.RuleCreator(
   (name) => `https://github.com/johannesvollmer/eslint-ts-avoid-as#${name}`
 )<[], MessageIds>({
-  name: 'avoid-as',
+  name: 'ts-avoid-as',
   meta: {
     type: 'problem',
     docs: {

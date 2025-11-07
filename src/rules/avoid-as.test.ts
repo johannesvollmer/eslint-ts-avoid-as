@@ -20,7 +20,7 @@ const ruleTester = new RuleTester({
 } as any);
 
 describe('avoid-as', () => {
-  ruleTester.run('avoid-as', rule, {
+  ruleTester.run('ts-avoid-as', rule, {
     valid: [
       {
         filename: 'using-satisfies-with-object-literal.ts',

@@ -1,7 +1,7 @@
 import avoidAs from './rules/avoid-as';
 
 export const rules = {
-  'avoid-as': avoidAs,
+  'ts-avoid-as': avoidAs,
 };
 
 export default {
