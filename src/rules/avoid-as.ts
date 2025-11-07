@@ -80,6 +80,8 @@ export const avoidAs = ESLintUtils.RuleCreator(
       }
 
       const expressionType = checker.getTypeAtLocation(tsExpressionNode);
+      // Use getTypeAtLocation instead of getTypeFromTypeNode to handle all type annotations,
+      // including type keywords (null, undefined, void, etc.) that are not wrapped in LiteralType nodes
       const targetType = checker.getTypeAtLocation(tsTypeAnnotation);
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
 
