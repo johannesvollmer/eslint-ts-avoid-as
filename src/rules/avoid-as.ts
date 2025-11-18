@@ -70,7 +70,7 @@ export const avoidAs = ESLintUtils.RuleCreator(
       const tsExpressionNode = services.esTreeNodeToTSNodeMap.get(node.expression);
       const tsTypeAnnotation = services.esTreeNodeToTSNodeMap.get(node.typeAnnotation);
 
-      if (!tsExpressionNode || !tsTypeAnnotation || !ts.isTypeNode(tsTypeAnnotation)) {
+      if (!tsExpressionNode || !tsTypeAnnotation) {
         context.report({
           node,
           messageId: 'requiresTypeInformation',
@@ -79,8 +79,39 @@ export const avoidAs = ESLintUtils.RuleCreator(
         return;
       }
 
-      const expressionType = checker.getTypeAtLocation(tsExpressionNode);
-      const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
+      // Try to get types - some type annotations might not be TypeNode but we can still get types
+      let expressionType: ts.Type | undefined;
+      let targetType: ts.Type | undefined;
+
+      try {
+        expressionType = checker.getTypeAtLocation(tsExpressionNode);
+        
+        // Try different methods to get the target type
+        if (ts.isTypeNode(tsTypeAnnotation)) {
+          targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
+        } else {
+          // Fallback: get type at location for non-type nodes
+          targetType = checker.getTypeAtLocation(tsTypeAnnotation);
+        }
+      } catch {
+        // If we can't get type information, report and suggest fix
+        context.report({
+          node,
+          messageId: 'requiresTypeInformation',
+          fix: createFix(node, context),
+        });
+        return;
+      }
+
+      if (!expressionType || !targetType) {
+        context.report({
+          node,
+          messageId: 'requiresTypeInformation',
+          fix: createFix(node, context),
+        });
+        return;
+      }
+
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
 
       if (!isAssignable) {
