@@ -75,7 +75,12 @@ export default [
       'ts-avoid-as': tsAvoidAs,
     },
     rules: {
-      'ts-avoid-as/avoid-as': 'error',
+      // Recommended: Use separate rules for better control
+      'ts-avoid-as/use-satisfies-for-literals': 'warn',
+      'ts-avoid-as/literal-type-mismatch': 'error',
+      
+      // Alternative: Use the combined rule (deprecated, kept for backwards compatibility)
+      // 'ts-avoid-as/avoid-as': 'error',
     },
   },
 ];
@@ -86,7 +91,12 @@ export default [
 module.exports = {
   plugins: ['ts-avoid-as'],
   rules: {
-    'ts-avoid-as/avoid-as': 'error',
+    // Recommended: Use separate rules for better control
+    'ts-avoid-as/use-satisfies-for-literals': 'warn',
+    'ts-avoid-as/literal-type-mismatch': 'error',
+    
+    // Alternative: Use the combined rule (deprecated, kept for backwards compatibility)
+    // 'ts-avoid-as/avoid-as': 'error',
   },
 };
 ```
@@ -96,7 +106,8 @@ module.exports = {
 {
   "plugins": ["ts-avoid-as"],
   "rules": {
-    "ts-avoid-as/avoid-as": "error"
+    "ts-avoid-as/use-satisfies-for-literals": "warn",
+    "ts-avoid-as/literal-type-mismatch": "error"
   }
 }
 ```
@@ -122,7 +133,8 @@ export default [
       'ts-avoid-as': tsAvoidAs,
     },
     rules: {
-      'ts-avoid-as/avoid-as': 'error',
+      'ts-avoid-as/use-satisfies-for-literals': 'warn',
+      'ts-avoid-as/literal-type-mismatch': 'error',
     },
   },
 ];
@@ -137,18 +149,37 @@ module.exports = {
   },
   plugins: ['ts-avoid-as'],
   rules: {
-    'ts-avoid-as/avoid-as': 'error',
+    'ts-avoid-as/use-satisfies-for-literals': 'warn',
+    'ts-avoid-as/literal-type-mismatch': 'error',
   },
 };
 ```
 
+## 📋 Rules
+
+This plugin provides two separate rules that can be configured independently:
+
+### `ts-avoid-as/use-satisfies-for-literals` (Recommended: `warn`)
+
+This rule warns when you use `as` on literal values with compatible types and provides an auto-fix to replace `as` with `satisfies`.
+
+**Why separate this rule?** Using `satisfies` instead of `as` preserves type inference while still checking type compatibility. This is usually a safe change that improves type safety without breaking your code.
+
+### `ts-avoid-as/literal-type-mismatch` (Recommended: `error`)
+
+This rule reports an error when you try to assert a literal value to an incompatible type using `as`. No auto-fix is provided because the code is likely incorrect and needs manual review.
+
+**Why separate this rule?** Type mismatches are usually bugs that need immediate attention. Separating this allows you to treat them as errors while treating the safer `satisfies` suggestions as warnings.
+
+### `ts-avoid-as/avoid-as` (Deprecated)
+
+The original combined rule is kept for backwards compatibility. It reports both compatible and incompatible type assertions. Consider migrating to the two separate rules for better control over error severity.
+
 ## 📋 Rule Details
 
-This rule reports two types of issues:
+### 1. `use-satisfies-for-literals`: Compatible type assertions
 
-### 1. Unnecessary `as` with compatible types
-
-When you use `as` on a literal value with a compatible type, the rule suggests using `satisfies` instead and provides an automatic fix.
+When you use `as` on a literal value with a compatible type, this rule suggests using `satisfies` instead and provides an automatic fix.
 
 **Examples of incorrect code:**
 
@@ -185,9 +216,9 @@ const value = getValue() as number;
 const result = someVariable as SomeType;
 ```
 
-### 2. Incompatible type assertions
+### 2. `literal-type-mismatch`: Incompatible type assertions
 
-When you try to assert a literal value to an incompatible type, the rule reports an error without providing a fix (because the code is likely incorrect).
+When you try to assert a literal value to an incompatible type, this rule reports an error without providing a fix (because the code is likely incorrect and needs manual review).
 
 **Examples of incorrect code:**
 
@@ -206,15 +237,15 @@ const user = { name: "John" } as User;  // Error: Property 'age' is missing
 
 ## 🔧 Options
 
-This rule currently has no configuration options.
+These rules currently have no configuration options.
 
-## 🤝 When NOT to use this rule
+## 🤝 When NOT to use these rules
 
-You might want to disable this rule if:
+You might want to disable these rules if:
 
 - You're working with legacy TypeScript code (< 4.9) that doesn't support `satisfies`
 - You're intentionally using `as` for type assertions on literals (though we'd recommend reconsidering this)
-- You're using `as const` exclusively (which is allowed by this rule)
+- You're using `as const` exclusively (which is allowed by these rules)
 
 ## 🐛 Compatibility
 
