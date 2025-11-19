@@ -82,7 +82,26 @@ export const useSatisfiesForLiterals = ESLintUtils.RuleCreator(
       const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
 
-      if (isAssignable) {
+      // For object literals, check if all required properties are present
+      // Don't suggest `satisfies` if properties are missing (let literal-type-mismatch handle it)
+      let hasMissingProperties = false;
+      if (node.expression.type === 'ObjectExpression' && isAssignable) {
+        const targetProperties = targetType.getProperties();
+        const expressionProperties = expressionType.getProperties();
+        
+        for (const targetProp of targetProperties) {
+          const isOptional = (targetProp.flags & ts.SymbolFlags.Optional) !== 0;
+          if (!isOptional) {
+            const hasProp = expressionProperties.some(p => p.name === targetProp.name);
+            if (!hasProp) {
+              hasMissingProperties = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (isAssignable && !hasMissingProperties) {
         context.report({
           node,
           messageId: 'useSatisfiesForLiterals',

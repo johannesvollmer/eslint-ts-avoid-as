@@ -97,6 +97,27 @@ describe('literal-type-mismatch', () => {
           const flag = true as boolean;
         `,
       },
+      {
+        filename: 'object-with-all-required-properties-present.ts',
+        code: `
+          interface Config {
+            name: string;
+            value: number;
+          }
+          const config = { name: "test", value: 42 } as Config;
+        `,
+      },
+      {
+        filename: 'object-with-optional-property-missing.ts',
+        code: `
+          interface User {
+            id: number;
+            name: string;
+            email?: string;
+          }
+          const user = { id: 1, name: "Alice" } as User;
+        `,
+      },
     ],
     invalid: [
       {
@@ -315,6 +336,54 @@ describe('literal-type-mismatch', () => {
             name: string;
           }
           const val = {} as MyInterface;
+        `,
+        errors: [
+          {
+            messageId: 'literalTypeMismatch',
+          },
+        ],
+      },
+      {
+        filename: 'partial-object-missing-required-property.ts',
+        code: `
+          interface User {
+            id: number;
+            name: string;
+            email: string;
+          }
+          const user = { id: 1 } as User;
+        `,
+        errors: [
+          {
+            messageId: 'literalTypeMismatch',
+          },
+        ],
+      },
+      {
+        filename: 'object-with-one-property-missing-others.ts',
+        code: `
+          interface Person {
+            firstName: string;
+            lastName: string;
+            age: number;
+          }
+          const person = { firstName: "John" } as Person;
+        `,
+        errors: [
+          {
+            messageId: 'literalTypeMismatch',
+          },
+        ],
+      },
+      {
+        filename: 'nested-object-missing-required-properties.ts',
+        code: `
+          interface Address {
+            street: string;
+            city: string;
+            zipCode: string;
+          }
+          const addr = { street: "Main St" } as Address;
         `,
         errors: [
           {
