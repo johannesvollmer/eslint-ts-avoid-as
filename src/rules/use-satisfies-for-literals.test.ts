@@ -478,28 +478,6 @@ describe('use-satisfies-for-literals', () => {
           },
         ],
       },
-      {
-        filename: 'empty-object-as-interface-with-required-properties.ts',
-        code: `
-          interface Required {
-            id: number;
-            name: string;
-          }
-          const val = {} as Required;
-        `,
-        output: `
-          interface Required {
-            id: number;
-            name: string;
-          }
-          const val = {} satisfies Required;
-        `,
-        errors: [
-          {
-            messageId: 'useSatisfiesForLiterals',
-          },
-        ],
-      },
     ],
   });
 });

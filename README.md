@@ -75,12 +75,8 @@ export default [
       'ts-avoid-as': tsAvoidAs,
     },
     rules: {
-      // Recommended: Use separate rules for better control
       'ts-avoid-as/use-satisfies-for-literals': 'warn',
       'ts-avoid-as/literal-type-mismatch': 'error',
-      
-      // Alternative: Use the combined rule (deprecated, kept for backwards compatibility)
-      // 'ts-avoid-as/avoid-as': 'error',
     },
   },
 ];
@@ -91,12 +87,8 @@ export default [
 module.exports = {
   plugins: ['ts-avoid-as'],
   rules: {
-    // Recommended: Use separate rules for better control
     'ts-avoid-as/use-satisfies-for-literals': 'warn',
     'ts-avoid-as/literal-type-mismatch': 'error',
-    
-    // Alternative: Use the combined rule (deprecated, kept for backwards compatibility)
-    // 'ts-avoid-as/avoid-as': 'error',
   },
 };
 ```
@@ -170,10 +162,6 @@ This rule warns when you use `as` on literal values with compatible types and pr
 This rule reports an error when you try to assert a literal value to an incompatible type using `as`. No auto-fix is provided because the code is likely incorrect and needs manual review.
 
 **Why separate this rule?** Type mismatches are usually bugs that need immediate attention. Separating this allows you to treat them as errors while treating the safer `satisfies` suggestions as warnings.
-
-### `ts-avoid-as/avoid-as` (Deprecated)
-
-The original combined rule is kept for backwards compatibility. It reports both compatible and incompatible type assertions. Consider migrating to the two separate rules for better control over error severity.
 
 ## 📋 Rule Details
 
