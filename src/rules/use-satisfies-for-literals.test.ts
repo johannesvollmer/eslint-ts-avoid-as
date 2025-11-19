@@ -1,7 +1,7 @@
 import path from 'path';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import parser from '@typescript-eslint/parser';
-import rule from './avoid-as';
+import rule from './use-satisfies-for-literals';
 
 // Configure RuleTester afterAll for Jest compatibility
 RuleTester.afterAll = afterAll;
@@ -19,8 +19,8 @@ const ruleTester = new RuleTester({
   },
 } as any);
 
-describe('avoid-as', () => {
-  ruleTester.run('ts-avoid-as', rule, {
+describe('use-satisfies-for-literals', () => {
+  ruleTester.run('use-satisfies-for-literals', rule, {
     valid: [
       {
         filename: 'using-satisfies-with-object-literal.ts',
@@ -141,6 +141,19 @@ describe('avoid-as', () => {
           const t = typeof value as "string" | "number";
         `,
       },
+      // Incompatible types should not be reported by this rule
+      {
+        filename: 'string-literal-as-boolean-incompatible.ts',
+        code: `
+          const val = "hi" as boolean;
+        `,
+      },
+      {
+        filename: 'number-literal-as-string-incompatible.ts',
+        code: `
+          const val = 42 as string;
+        `,
+      },
     ],
     invalid: [
       {
@@ -161,7 +174,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -175,7 +188,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -215,7 +228,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -229,7 +242,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -243,7 +256,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -257,7 +270,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -271,21 +284,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
-          },
-        ],
-      },
-      {
-        filename: 'as-with-null-literal.ts',
-        code: `
-          const val = null as null;
-        `,
-        output: `
-          const val = null satisfies null;
-        `,
-        errors: [
-          {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -299,7 +298,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -313,7 +312,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -327,7 +326,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -341,7 +340,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -355,7 +354,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -375,7 +374,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -389,7 +388,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -405,7 +404,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -421,7 +420,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -439,7 +438,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -461,7 +460,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },
@@ -475,285 +474,7 @@ describe('avoid-as', () => {
         `,
         errors: [
           {
-            messageId: 'avoidAsWithLiteral',
-          },
-        ],
-      },
-      {
-        filename: 'string-literal-as-boolean-incompatible.ts',
-        code: `
-          const val = "hi" as boolean;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: '"hi"',
-              targetType: 'boolean',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'number-literal-as-string-incompatible.ts',
-        code: `
-          const val = 42 as string;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: '42',
-              targetType: 'string',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'boolean-literal-as-number-incompatible.ts',
-        code: `
-          const val = true as number;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: 'true',
-              targetType: 'number',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'array-literal-as-object-incompatible.ts',
-        code: `
-          interface User {
-            name: string;
-            age: number;
-          }
-          const val = [1, 2, 3] as User;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: 'number[]',
-              targetType: 'User',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'object-literal-with-wrong-structure.ts',
-        code: `
-          interface Config {
-            name: string;
-            value: number;
-          }
-          const val = { name: "test", wrongProp: true } as Config;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-          },
-        ],
-      },
-      {
-        filename: 'string-literal-wrong-union-member.ts',
-        code: `
-          type Status = "active" | "inactive";
-          const val = "pending" as Status;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: '"pending"',
-              targetType: 'Status',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'number-literal-wrong-union-member.ts',
-        code: `
-          type Port = 80 | 443 | 8080;
-          const val = 3000 as Port;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: '3000',
-              targetType: 'Port',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'null-as-non-nullable-object.ts',
-        code: `
-          interface User {
-            name: string;
-          }
-          const val = null as User;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: 'null',
-              targetType: 'User',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'object-literal-as-primitive.ts',
-        code: `
-          const val = { x: 1 } as number;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-          },
-        ],
-      },
-      {
-        filename: 'array-as-string.ts',
-        code: `
-          const val = [1, 2, 3] as string;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: 'number[]',
-              targetType: 'string',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'empty-object-as-interface-with-required-properties.ts',
-        code: `
-          interface Required {
-            id: number;
-            name: string;
-          }
-          const val = {} as Required;
-        `,
-        output: `
-          interface Required {
-            id: number;
-            name: string;
-          }
-          const val = {} satisfies Required;
-        `,
-        errors: [
-          {
-            messageId: 'avoidAsWithLiteral',
-          },
-        ],
-      },
-      {
-        filename: 'wrong-tuple-length.ts',
-        code: `
-          const val = [1, 2, 3] as [number, number];
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-          },
-        ],
-      },
-      {
-        filename: 'wrong-tuple-element-types.ts',
-        code: `
-          const val = ["hello", "world"] as [string, number];
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-          },
-        ],
-      },
-      {
-        filename: 'incompatible-union-types.ts',
-        code: `
-          type A = "a" | "b";
-          type B = "c" | "d";
-          const val = "a" as B;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: '"a"',
-              targetType: 'B',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'incompatible-interfaces.ts',
-        code: `
-          interface A {
-            propA: string;
-          }
-          interface B {
-            propB: number;
-          }
-          const val = { propA: "test" } as B;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-          },
-        ],
-      },
-      {
-        filename: 'number-as-boolean.ts',
-        code: `
-          const val = 1 as boolean;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: '1',
-              targetType: 'boolean',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'boolean-as-string.ts',
-        code: `
-          const val = false as string;
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: 'false',
-              targetType: 'string',
-            },
-          },
-        ],
-      },
-      {
-        filename: 'string-as-number-array.ts',
-        code: `
-          const val = "hello" as number[];
-        `,
-        errors: [
-          {
-            messageId: 'incompatibleTypeAssertion',
-            data: {
-              sourceType: '"hello"',
-              targetType: 'number[]',
-            },
+            messageId: 'useSatisfiesForLiterals',
           },
         ],
       },

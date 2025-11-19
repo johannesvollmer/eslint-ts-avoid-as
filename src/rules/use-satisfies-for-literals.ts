@@ -1,7 +1,7 @@
 import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 
-type MessageIds = 'avoidAsWithLiteral' | 'incompatibleTypeAssertion' | 'requiresTypeInformation';
+type MessageIds = 'useSatisfiesForLiterals' | 'requiresTypeInformation';
 
 const isConstAssertion = (node: TSESTree.TSAsExpression): boolean => {
   return (
@@ -31,18 +31,17 @@ const createFix = (node: TSESTree.TSAsExpression, context: TSESLint.RuleContext<
   };
 };
 
-export const avoidAs = ESLintUtils.RuleCreator(
+export const useSatisfiesForLiterals = ESLintUtils.RuleCreator(
   (name) => `https://github.com/johannesvollmer/eslint-ts-avoid-as#${name}`
 )<[], MessageIds>({
-  name: 'ts-avoid-as',
+  name: 'use-satisfies-for-literals',
   meta: {
     type: 'problem',
     docs: {
-      description: 'Warn about using `as` for type assertions on literals; use `satisfies` instead',
+      description: 'Warn about using `as` for type assertions on compatible literal types; use `satisfies` instead',
     },
     messages: {
-      avoidAsWithLiteral: 'Avoid using `as` for type assertions on literals. Use `satisfies` instead.',
-      incompatibleTypeAssertion: 'This literal does not match the declared type. Use the `satisfies` keyword instead of `as` to enable type checking.',
+      useSatisfiesForLiterals: 'Avoid using `as` for type assertions on literals. Use `satisfies` instead.',
       requiresTypeInformation: 'Checking type assignability requires full type information. Ensure you are using @typescript-eslint/parser with project configuration.',
     },
     schema: [],
@@ -83,15 +82,10 @@ export const avoidAs = ESLintUtils.RuleCreator(
       const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
 
-      if (!isAssignable) {
+      if (isAssignable) {
         context.report({
           node,
-          messageId: 'incompatibleTypeAssertion',
-        });
-      } else {
-        context.report({
-          node,
-          messageId: 'avoidAsWithLiteral',
+          messageId: 'useSatisfiesForLiterals',
           fix: createFix(node, context),
         });
       }
@@ -103,4 +97,4 @@ export const avoidAs = ESLintUtils.RuleCreator(
   },
 });
 
-export default avoidAs;
+export default useSatisfiesForLiterals;
