@@ -1,5 +1,6 @@
 import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
+import { hasMissingRequiredProperties } from './utils';
 
 type MessageIds = 'literalTypeMismatch' | 'requiresTypeInformation';
 
@@ -59,8 +60,9 @@ export const literalTypeMismatch = ESLintUtils.RuleCreator(
       const expressionType = checker.getTypeAtLocation(tsExpressionNode);
       const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
+      const missingProperties = isAssignable && hasMissingRequiredProperties(node, expressionType, targetType);
 
-      if (!isAssignable) {
+      if (!isAssignable || missingProperties) {
         context.report({
           node,
           messageId: 'literalTypeMismatch',

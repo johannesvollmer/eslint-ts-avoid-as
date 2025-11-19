@@ -1,5 +1,6 @@
 import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
+import { hasMissingRequiredProperties } from './utils';
 
 type MessageIds = 'useSatisfiesForLiterals' | 'requiresTypeInformation';
 
@@ -81,8 +82,10 @@ export const useSatisfiesForLiterals = ESLintUtils.RuleCreator(
       const expressionType = checker.getTypeAtLocation(tsExpressionNode);
       const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
+      const missingProperties = isAssignable && hasMissingRequiredProperties(node, expressionType, targetType);
 
-      if (isAssignable) {
+      // Don't suggest `satisfies` if properties are missing (let literal-type-mismatch handle it)
+      if (isAssignable && !missingProperties) {
         context.report({
           node,
           messageId: 'useSatisfiesForLiterals',
