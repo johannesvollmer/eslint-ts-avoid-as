@@ -307,6 +307,21 @@ describe('literal-type-mismatch', () => {
           },
         ],
       },
+      {
+        filename: 'empty-object-as-required-interface.ts',
+        code: `
+          interface MyInterface {
+            id: number;
+            name: string;
+          }
+          const val = {} as MyInterface;
+        `,
+        errors: [
+          {
+            messageId: 'literalTypeMismatch',
+          },
+        ],
+      },
     ],
   });
 });

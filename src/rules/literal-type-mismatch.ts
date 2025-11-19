@@ -60,7 +60,27 @@ export const literalTypeMismatch = ESLintUtils.RuleCreator(
       const targetType = checker.getTypeFromTypeNode(tsTypeAnnotation);
       const isAssignable = checker.isTypeAssignableTo(expressionType, targetType);
 
-      if (!isAssignable) {
+      // For object literals, check if all required properties are present
+      // This catches cases like `{} as RequiredInterface` which TypeScript allows
+      // with `as` but would reject with `satisfies`
+      let hasMissingProperties = false;
+      if (node.expression.type === 'ObjectExpression' && isAssignable) {
+        const targetProperties = targetType.getProperties();
+        const expressionProperties = expressionType.getProperties();
+        
+        for (const targetProp of targetProperties) {
+          const isOptional = (targetProp.flags & ts.SymbolFlags.Optional) !== 0;
+          if (!isOptional) {
+            const hasProp = expressionProperties.some(p => p.name === targetProp.name);
+            if (!hasProp) {
+              hasMissingProperties = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!isAssignable || hasMissingProperties) {
         context.report({
           node,
           messageId: 'literalTypeMismatch',
