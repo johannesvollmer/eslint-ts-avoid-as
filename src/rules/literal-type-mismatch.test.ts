@@ -118,6 +118,36 @@ describe('literal-type-mismatch', () => {
           const user = { id: 1, name: "Alice" } as User;
         `,
       },
+      // Test files should be allowed to use 'as' for mocking, even with type mismatches
+      {
+        filename: 'component.test.ts',
+        code: `
+          const val = "hi" as boolean;
+        `,
+      },
+      {
+        filename: 'utils.test.tsx',
+        code: `
+          interface User {
+            name: string;
+            age: number;
+          }
+          const mockUser = { name: "Test" } as User; // missing 'age' property
+        `,
+      },
+      {
+        filename: 'integration.test.ts',
+        code: `
+          type Status = "active" | "inactive";
+          const mockStatus = "pending" as Status; // wrong union member
+        `,
+      },
+      {
+        filename: 'feature.test.spec.ts',
+        code: `
+          const val = 42 as string; // incompatible type
+        `,
+      },
     ],
     invalid: [
       {

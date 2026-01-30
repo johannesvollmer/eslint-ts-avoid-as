@@ -41,6 +41,12 @@ export const literalTypeMismatch = ESLintUtils.RuleCreator(
     const services = ESLintUtils.getParserServices(context, true);
     
     const handleAsExpression = (node: TSESTree.TSAsExpression) => {
+      // Skip if filename contains .test. (test files)
+      const filename = context.filename || context.getFilename();
+      if (filename.includes('.test.')) {
+        return;
+      }
+      
       if (isConstAssertion(node) || !isLiteralExpression(node.expression)) {
         return;
       }
