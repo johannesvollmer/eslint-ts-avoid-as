@@ -73,6 +73,10 @@ export const literalTypeMismatch = ESLintUtils.RuleCreator(
       if (!isAssignable || missingProperties) {
         context.report({
           node,
+          loc: {
+            start: node.expression.loc.start,
+            end: node.typeAnnotation.loc.end,
+          },
           messageId: 'literalTypeMismatch',
         });
       }
