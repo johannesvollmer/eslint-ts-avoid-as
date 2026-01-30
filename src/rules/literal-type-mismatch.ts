@@ -40,7 +40,15 @@ export const literalTypeMismatch = ESLintUtils.RuleCreator(
   create(context) {
     const services = ESLintUtils.getParserServices(context, true);
     
+    // Check if this is a test file (skip the rule for test files)
+    const filename = context.filename || context.getFilename();
+    const isTestFile = /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(filename);
+    
     const handleAsExpression = (node: TSESTree.TSAsExpression) => {
+      if (isTestFile) {
+        return;
+      }
+      
       if (isConstAssertion(node) || !isLiteralExpression(node.expression)) {
         return;
       }

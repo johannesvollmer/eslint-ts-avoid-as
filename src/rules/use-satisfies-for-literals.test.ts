@@ -154,6 +154,44 @@ describe('use-satisfies-for-literals', () => {
           const val = 42 as string;
         `,
       },
+      // Test files should be allowed to use 'as' for mocking
+      {
+        filename: 'component.test.ts',
+        code: `
+          interface User {
+            name: string;
+            age: number;
+          }
+          const mockUser = { name: "Test User", age: 25 } as User;
+        `,
+      },
+      {
+        filename: 'utils.test.tsx',
+        code: `
+          const mockData = [1, 2, 3] as number[];
+        `,
+      },
+      {
+        filename: 'integration.test.ts',
+        code: `
+          const config = { key: "value" } as Record<string, any>;
+        `,
+      },
+      {
+        filename: 'my-feature.test.ts',
+        code: `
+          const testString = "hello" as string;
+        `,
+      },
+      {
+        filename: 'my-component.spec.ts',
+        code: `
+          interface Props {
+            title: string;
+          }
+          const mockProps = { title: "Test" } as Props;
+        `,
+      },
     ],
     invalid: [
       {
