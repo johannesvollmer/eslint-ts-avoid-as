@@ -94,19 +94,11 @@ export const useSatisfiesForLiterals = ESLintUtils.RuleCreator(
 
       // Don't suggest `satisfies` if properties are missing (let literal-type-mismatch handle it)
       if (isAssignable && !missingProperties) {
-        // Calculate the end column to account for the length difference between "satisfies" and "as"
-        // This makes the error range reflect the space the code will occupy after the fix
-        const lengthDifference = 'satisfies'.length - 'as'.length; // 9 - 2 = 7
-        const adjustedEnd = {
-          line: node.typeAnnotation.loc.end.line,
-          column: node.typeAnnotation.loc.end.column + lengthDifference,
-        };
-        
         context.report({
           node,
           loc: {
             start: node.expression.loc.start,
-            end: adjustedEnd,
+            end: node.typeAnnotation.loc.end,
           },
           messageId: 'useSatisfiesForLiterals',
           fix: createFix(node, context),

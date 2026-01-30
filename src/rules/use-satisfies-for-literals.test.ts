@@ -310,7 +310,7 @@ describe('use-satisfies-for-literals', () => {
           {
             messageId: 'useSatisfiesForLiterals',
             column: 23,
-            endColumn: 42,
+            endColumn: 35,
           },
         ],
 
@@ -369,7 +369,7 @@ describe('use-satisfies-for-literals', () => {
           {
             messageId: 'useSatisfiesForLiterals',
             column: 25,
-            endColumn: 65,
+            endColumn: 58,
           },
         ],
       },
