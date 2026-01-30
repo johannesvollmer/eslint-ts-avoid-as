@@ -52,10 +52,12 @@ export const useSatisfiesForLiterals = ESLintUtils.RuleCreator(
   create(context) {
     const services = ESLintUtils.getParserServices(context, true);
     
+    // Check if this is a test file (skip the rule for test files)
+    const filename = context.filename || context.getFilename();
+    const isTestFile = /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(filename);
+    
     const handleAsExpression = (node: TSESTree.TSAsExpression) => {
-      // Skip if filename contains .test. (test files)
-      const filename = context.filename || context.getFilename();
-      if (filename.includes('.test.')) {
+      if (isTestFile) {
         return;
       }
       

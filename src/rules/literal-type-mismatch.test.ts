@@ -143,9 +143,18 @@ describe('literal-type-mismatch', () => {
         `,
       },
       {
-        filename: 'feature.test.spec.ts',
+        filename: 'feature.test.ts',
         code: `
           const val = 42 as string; // incompatible type
+        `,
+      },
+      {
+        filename: 'component.spec.tsx',
+        code: `
+          interface Config {
+            enabled: boolean;
+          }
+          const mockConfig = {} as Config; // missing required property
         `,
       },
     ],

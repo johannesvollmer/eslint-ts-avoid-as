@@ -178,9 +178,18 @@ describe('use-satisfies-for-literals', () => {
         `,
       },
       {
-        filename: 'my-feature.test.spec.ts',
+        filename: 'my-feature.test.ts',
         code: `
           const testString = "hello" as string;
+        `,
+      },
+      {
+        filename: 'my-component.spec.ts',
+        code: `
+          interface Props {
+            title: string;
+          }
+          const mockProps = { title: "Test" } as Props;
         `,
       },
     ],
