@@ -1,6 +1,6 @@
 {
   "name": "eslint-ts-avoid-as",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "ESLint rule to avoid `as` in cases where it seems unnecessary or wrong",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
