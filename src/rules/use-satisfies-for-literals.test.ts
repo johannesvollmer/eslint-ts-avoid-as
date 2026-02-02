@@ -309,8 +309,11 @@ describe('use-satisfies-for-literals', () => {
         errors: [
           {
             messageId: 'useSatisfiesForLiterals',
+            column: 23,
+            endColumn: 35,
           },
         ],
+
       },
       {
         filename: 'as-with-boolean-literal.ts',
@@ -365,6 +368,8 @@ describe('use-satisfies-for-literals', () => {
         errors: [
           {
             messageId: 'useSatisfiesForLiterals',
+            column: 25,
+            endColumn: 58,
           },
         ],
       },

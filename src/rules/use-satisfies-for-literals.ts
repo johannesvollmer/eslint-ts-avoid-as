@@ -96,6 +96,10 @@ export const useSatisfiesForLiterals = ESLintUtils.RuleCreator(
       if (isAssignable && !missingProperties) {
         context.report({
           node,
+          loc: {
+            start: node.expression.loc.start,
+            end: node.typeAnnotation.loc.end,
+          },
           messageId: 'useSatisfiesForLiterals',
           fix: createFix(node, context),
         });

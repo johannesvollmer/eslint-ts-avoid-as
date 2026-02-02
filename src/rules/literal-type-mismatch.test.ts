@@ -204,6 +204,8 @@ describe('literal-type-mismatch', () => {
         errors: [
           {
             messageId: 'literalTypeMismatch',
+            column: 23,
+            endColumn: 40,
           },
         ],
       },
@@ -390,11 +392,17 @@ describe('literal-type-mismatch', () => {
             name: string;
             email: string;
           }
-          const user = { id: 1 } as User;
+          const user = { 
+            id: 1
+          } as User;
         `,
         errors: [
           {
             messageId: 'literalTypeMismatch',
+            line: 7,
+            column: 24,
+            endLine: 9,
+            endColumn: 20,
           },
         ],
       },
